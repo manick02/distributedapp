@@ -6,9 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="distributedapp" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="distributedapp" target="1.8" />
       <module name="sampleApp" target="1.7" />
     </bytecodeTargetLevel>
   </component>
