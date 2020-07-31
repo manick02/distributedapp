@@ -15,6 +15,10 @@ public class HelperClassToCreateCluster {
        SetupController();
        SetupResource();
        SetupParticipant();
+       DemoRebalancing();
+    }
+
+    private static void DemoRebalancing() {
     }
 
     private static void SetupParticipant() {
