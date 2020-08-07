@@ -25,7 +25,9 @@ public class HelperClassToCreateCluster {
     static String RESOURCE_NAME="test_resource";
     static int NUM_OF_PARTITION = 6;
     static String ONLINE_OFFLINE="ONLINEOFFLINE";
-    static String FIRSTINSTANCE = "Instance_1";
+    static String FIRSTINSTANCE = "localhost:9001";
+    static String INSTANCENAME = "localhost";
+    static int PORT = 9001;
 
     public static void main(String[] args) throws Exception {
        SetupCluster();
@@ -33,17 +35,24 @@ public class HelperClassToCreateCluster {
        SetupResource();
        SetupParticipant();
        DemoRebalancing();
+
+
     }
 
     private static void DemoRebalancing() {
     }
 
     private static void SetupParticipant() throws Exception {
-        OnlineOfflineStateModelFactory stateModelFactory = new OnlineOfflineStateModelFactory();
-        participantManager = HelixManagerFactory.getZKHelixManager(CLUSTER_NAME,FIRSTINSTANCE, InstanceType.PARTICIPANT,ZK_ADDRESS);
-        StateMachineEngine stateMachineEngine = participantManager.getStateMachineEngine();
-        stateMachineEngine.registerStateModelFactory("ONLINEOFFLINE",stateModelFactory);
-        participantManager.connect();
+        for (int i = 0; i < NUMBEROFPARTICIPANT; i++) {
+            ParticipantApp participantApp = new ParticipantApp(CLUSTER_NAME,INSTANCENAME + "_" + i, PORT+i,ZK_ADDRESS);
+            participantApp.start();
+        }
+
+//        OnlineOfflineStateModelFactory stateModelFactory = new OnlineOfflineStateModelFactory();
+//        participantManager = HelixManagerFactory.getZKHelixManager(CLUSTER_NAME,FIRSTINSTANCE, InstanceType.PARTICIPANT,ZK_ADDRESS);
+//        StateMachineEngine stateMachineEngine = participantManager.getStateMachineEngine();
+//        stateMachineEngine.registerStateModelFactory("ONLINEOFFLINE",stateModelFactory);
+//        participantManager.connect();
     }
 
     private static void SetupResource() {

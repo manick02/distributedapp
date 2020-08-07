@@ -19,6 +19,21 @@ import java.util.concurrent.TimeUnit;
  */
 public class ParticipantApp implements Runnable
 {
+    private HelixManager participantManager;
+    private String instanceName;
+    public ParticipantApp(String clusterName, String instanceName, int port, String zkAddress) {
+        this.instanceName = instanceName +":"+port;
+        participantManager = HelixManagerFactory.getZKHelixManager(clusterName,this.instanceName, InstanceType.PARTICIPANT,zkAddress);
+        OnlineOfflineStateModelFactory stateModelFactory = new OnlineOfflineStateModelFactory();
+        StateMachineEngine stateMachineEngine = participantManager.getStateMachineEngine();
+        stateMachineEngine.registerStateModelFactory("ONLINEOFFLINE",stateModelFactory);
+
+    }
+
+    public void start() throws Exception {
+        participantManager.connect();
+        System.out.print("Started Port Name :"+ this.instanceName);
+    }
 //    public static void main( String[] args ) throws InterruptedException {
 //        System.out.println( "Hello World!" );
 //        ExecutorService executorService = new ThreadPoolExecutor(1, 10, 0L, TimeUnit.MILLISECONDS,  new LinkedBlockingQueue<Runnable>());
