@@ -11,6 +11,8 @@ import org.apache.helix.model.StateModelDefinition;
 import org.apache.helix.participant.StateMachineEngine;
 import org.apache.helix.tools.StateModelConfigGenerator;
 
+import java.util.Arrays;
+import java.util.PriorityQueue;
 import java.util.concurrent.*;
 
 public class HelperClassToCreateCluster {
@@ -32,12 +34,15 @@ public class HelperClassToCreateCluster {
     public static void main(String[] args) throws Exception {
        SetupCluster();
        SetupController();
-       SetupResource();
+      // SetupResource();
        SetupParticipant();
        DemoRebalancing();
     }
 
     private static void DemoRebalancing() {
+//        PriorityQueue<int[]> array = new PriorityQueue<int[]>();
+//        Arrays.asList(array);
+
     }
 
     private static void SetupParticipant() throws Exception {
@@ -54,13 +59,14 @@ public class HelperClassToCreateCluster {
     }
 
     private static void SetupResource() {
-        admin.addResource(CLUSTER_NAME,RESOURCE_NAME,NUM_OF_PARTITION,"ONLINEOFFLINE");
+        admin.addResource(CLUSTER_NAME,RESOURCE_NAME,NUM_OF_PARTITION,"ONLINEOFFLINE", IdealState.RebalanceMode.FULL_AUTO.toString());
         admin.rebalance(CLUSTER_NAME,RESOURCE_NAME,1);
     }
 
     public static void SetupCluster() {
         admin.addCluster(CLUSTER_NAME,true);
         admin.addStateModelDef(CLUSTER_NAME,ONLINE_OFFLINE, new StateModelDefinition(StateModelConfigGenerator.generateConfigForOnlineOffline()),true);
+        SetupResource();
 //        admin.addStateModelDef(CLUSTER_NAME,"ONLINEOFFLINE", new StateModelDefinition());
     }
 

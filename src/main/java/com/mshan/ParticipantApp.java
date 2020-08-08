@@ -8,6 +8,7 @@ import org.apache.helix.manager.zk.ZKHelixAdmin;
 import org.apache.helix.model.InstanceConfig;
 import org.apache.helix.participant.StateMachineEngine;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -22,7 +23,9 @@ public class ParticipantApp implements Runnable
     private HelixManager participantManager;
     private String instanceName;
     public ParticipantApp(String clusterName, String instanceName, int port, String zkAddress) {
-        this.instanceName = instanceName +":"+port;
+        this.instanceName = instanceName ; //+":"+port;
+
+        configureInstance(instanceName,zkAddress,clusterName);
         participantManager = HelixManagerFactory.getZKHelixManager(clusterName,this.instanceName, InstanceType.PARTICIPANT,zkAddress);
         OnlineOfflineStateModelFactory stateModelFactory = new OnlineOfflineStateModelFactory();
         StateMachineEngine stateMachineEngine = participantManager.getStateMachineEngine();
@@ -33,6 +36,18 @@ public class ParticipantApp implements Runnable
     public void start() throws Exception {
         participantManager.connect();
         System.out.print("Started Port Name :"+ this.instanceName);
+    }
+
+    private void configureInstance(String instanceName,String zkAddress,String clusterName) {
+        ZKHelixAdmin helixAdmin = new ZKHelixAdmin(zkAddress);
+
+        List<String> instancesInCluster = helixAdmin.getInstancesInCluster(clusterName);
+        if (instancesInCluster == null || !instancesInCluster.contains(instanceName)) {
+            InstanceConfig config = new InstanceConfig(instanceName);
+            config.setHostName("localhost");
+            config.setPort("12000");
+            helixAdmin.addInstance(clusterName, config);
+        }
     }
 //    public static void main( String[] args ) throws InterruptedException {
 //        System.out.println( "Hello World!" );
