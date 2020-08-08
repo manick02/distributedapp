@@ -1,18 +1,23 @@
 package com.mshan;
 
+import com.sun.org.apache.regexp.internal.RE;
+import org.apache.helix.HelixAdmin;
 import org.apache.helix.HelixManager;
 import org.apache.helix.HelixManagerFactory;
 import org.apache.helix.InstanceType;
 import org.apache.helix.controller.HelixControllerMain;
 import org.apache.helix.examples.OnlineOfflineStateModelFactory;
 import org.apache.helix.manager.zk.ZKHelixAdmin;
+import org.apache.helix.model.ExternalView;
 import org.apache.helix.model.IdealState;
 import org.apache.helix.model.StateModelDefinition;
 import org.apache.helix.participant.StateMachineEngine;
 import org.apache.helix.tools.StateModelConfigGenerator;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.TreeSet;
 import java.util.concurrent.*;
 
 public class HelperClassToCreateCluster {
@@ -36,12 +41,34 @@ public class HelperClassToCreateCluster {
        SetupController();
       // SetupResource();
        SetupParticipant();
+       DisplayCluster(admin,CLUSTER_NAME, RESOURCE_NAME);
        DemoRebalancing();
     }
 
+    private static void DisplayCluster(HelixAdmin admin, String cluster, String resource) {
+        ExternalView externalView = admin.getResourceExternalView(cluster, resource);
+        // System.out.println(externalView);
+        TreeSet<String> treeSet = new TreeSet<String>(externalView.getPartitionSet());
+        System.out.println("lockName" + "\t" + "acquired By");
+        System.out.println("======================================");
+        for (String lockName : treeSet) {
+            Map<String, String> stateMap = externalView.getStateMap(lockName);
+            String acquiredBy = null;
+            if (stateMap != null) {
+                for (String instanceName : stateMap.keySet()) {
+                    if ("ONLINE".equals(stateMap.get(instanceName))) {
+                        acquiredBy = instanceName;
+                        break;
+                    }
+                }
+            }
+            System.out.println(lockName + "\t" + ((acquiredBy != null) ? acquiredBy : "NONE"));
+        }
+    }
     private static void DemoRebalancing() {
 //        PriorityQueue<int[]> array = new PriorityQueue<int[]>();
 //        Arrays.asList(array);
+        admin.rebalance(CLUSTER_NAME,RESOURCE_NAME,1);
 
     }
 

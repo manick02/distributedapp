@@ -25,7 +25,7 @@ public class ParticipantApp implements Runnable
     public ParticipantApp(String clusterName, String instanceName, int port, String zkAddress) {
         this.instanceName = instanceName ; //+":"+port;
 
-        configureInstance(instanceName,zkAddress,clusterName);
+        configureInstance(instanceName,zkAddress,clusterName,port);
         participantManager = HelixManagerFactory.getZKHelixManager(clusterName,this.instanceName, InstanceType.PARTICIPANT,zkAddress);
         OnlineOfflineStateModelFactory stateModelFactory = new OnlineOfflineStateModelFactory();
         StateMachineEngine stateMachineEngine = participantManager.getStateMachineEngine();
@@ -35,17 +35,17 @@ public class ParticipantApp implements Runnable
 
     public void start() throws Exception {
         participantManager.connect();
-        System.out.print("Started Port Name :"+ this.instanceName);
+        System.out.println("Started :"+ this.instanceName);
     }
 
-    private void configureInstance(String instanceName,String zkAddress,String clusterName) {
+    private void configureInstance(String instanceName,String zkAddress,String clusterName,int port) {
         ZKHelixAdmin helixAdmin = new ZKHelixAdmin(zkAddress);
 
         List<String> instancesInCluster = helixAdmin.getInstancesInCluster(clusterName);
         if (instancesInCluster == null || !instancesInCluster.contains(instanceName)) {
             InstanceConfig config = new InstanceConfig(instanceName);
             config.setHostName("localhost");
-            config.setPort("12000");
+            config.setPort(Integer.toString(port));//"12000");
             helixAdmin.addInstance(clusterName, config);
         }
     }
