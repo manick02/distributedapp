@@ -35,8 +35,6 @@ public class HelperClassToCreateCluster {
        SetupResource();
        SetupParticipant();
        DemoRebalancing();
-
-
     }
 
     private static void DemoRebalancing() {
@@ -57,6 +55,7 @@ public class HelperClassToCreateCluster {
 
     private static void SetupResource() {
         admin.addResource(CLUSTER_NAME,RESOURCE_NAME,NUM_OF_PARTITION,"ONLINEOFFLINE");
+        admin.rebalance(CLUSTER_NAME,RESOURCE_NAME,1);
     }
 
     public static void SetupCluster() {
